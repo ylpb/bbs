@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>register</title>
+    {% load static %}
+    <script src="{% static 'jquery/jquery.min.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'bootstrap-3.3.7-dist/css/bootstrap.css' %}">
+    <script src="{% static 'bootstrap-3.3.7-dist/js/bootstrap.min.js' %}"></script>
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 col-md-offset-2">
+            <h2 class="text-center">注册页面</h2>
+            <form id="myform">
+            {% csrf_token %}
+            {% for foo in form_obj %}
+                <div class="form-group">
+                    <label for="{{ foo.auto_id }}">{{ foo.label }}</label>
+                    {{ foo }}
+                    <span class="errors pull-right" style="color: red"></span>
+                </div>
+            {% endfor %}
+            <div class="form-group">
+                <label for="mdd">
+                    头像
+                    <img src="/static/img/default.jpg" alt="" width="80" style="margin-left: 10px " id="img">
+
+                </label>
+                <input type="file" name="avatar" id="mdd" style="display:none">
+            </div>
+            <input type="button" class="btn btn-success pull-right" value="注册" id="submit">
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    //头像的添加与读取，利用内置对象 FileReader完成文件的读取操作
+    //change函数，当元素的值发生改变时触发
+    //for 属性规定 label 与哪个表单元素绑定
+    $('#mdd').on('change',function () {
+        let MyFileReader = new FileReader();
+        //获取用户上传的文件对象
+        let fileObj = $(this)[0].files[0];
+        // 将读取之后的内容替换到img标签src属性中,异步操作
+        MyFileReader.readAsDataURL(fileObj);
+        MyFileReader.onload = function () {// 等待文件阅读器读取完毕之后再执行下面的代码
+            $('#img').attr('src',MyFileReader.result)
+        }
+    });
+
+    $('#submit').click(function () {
+        //将用户输入的数据发送给后端
+        let MyFormData = new FormData();
+
+        //each() 方法规定为每个匹配元素规定运行的函数。
+        //将form表单中除文件外的所有键值添加到MyFormData内
+        $.each($('#myform').serializeArray(),function(index,obj){
+            MyFormData.append(obj.name,obj.value)
+        });
+
+        //手动添加文件数据
+        MyFormData.append('avatar',$('#mdd')[0].files[0]);
+        $.ajax({
+            url:'',
+            type:'post',
+            data:MyFormData,
+            processData:false,
+            contentType:false,
+            success:function (data) {
+                if(data.code == 1000){
+                    window.location.href = data.url
+                }else{
+                    $.each(data.msg,function (index,obj) {
+                        // index就是报错字段  obj就是错误信息 数组的形式
+
+                        let targetId = '#id_' + index;// 获取报错字段  手动拼接处该字段所对应的input框的id值
+                        //在报错input下边的标签的文本中添加报错信息，并给它的父标签加入has-error样式，进行报错
+                        $(targetId).next().text(obj[0]).parent().addClass('has-error')
+
+                    })
+                }
+            }
+        })
+    });
+    //input框获取焦点事件,当获取焦点时将报错清空,将父类的has-error移除
+    $('input').focus(function () {
+        $(this).next().text('').parent().removeClass('has-error')
+    })
+</script>
+
+</body>
+</html>

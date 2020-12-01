@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block head %}
+<title>blog</title>
+{% endblock %}
+
+{% block content_left %}
+    <div class="list-group">
+        <p class="list-group-item active">
+            文章标签
+        </p>
+{#    r'^(?P<username>\w+)(?P<condition>classify|tag|time_classify)/(?P<param>.*)/',views.blog#}
+        {% for tag in tag_list %}
+         <a href="/{{ request.user }}/tag/{{ tag.2 }}" class="list-group-item">{{ tag.0 }}({{ tag.1 }})</a>
+        {% endfor %}
+    </div>
+    <div class="list-group">
+        <p  class="list-group-item active">
+            文章分类
+        </p>
+        {% for classify in classify_list %}
+        <a href="/{{ request.user }}/classify/{{ classify.2 }}" class="list-group-item">{{ classify.0 }}({{ classify.1 }})</a>
+        {% endfor %}
+    </div>
+    <div class="list-group">
+        <p  class="list-group-item active">
+            时间分类
+        </p>
+        {% for month in month_list %}
+        <a href="#" class="list-group-item">{{ month.0 }}({{ month.1 }})</a>
+        {% endfor %}
+    </div>
+
+{% endblock %}
+
+
+
+
+
+{% block content_right %}
+    <div>
+        {% for article in article_list %}
+            <div class="panel panel-success">
+                <p><a href="#"><h2>{{ article.title }}</h2></a></p>
+                <p>{{ article.abstract }}</p>
+                {#                极客挖掘机 发布于 2019-12-15 09:32 评论(0)阅读(10)#}
+                <p><a href="#">{{ article.blog.userinfo.username }}</a> &nbsp;&nbsp;发布于
+                    &nbsp;&nbsp;{{ article.create_time|date:'Y-m-d h:m:s' }}
+                    <a href="#">&nbsp;&nbsp;评论({{ article.comment_num }})
+                    </a> <a href="#">点赞({{ article.up_num }})</a></p>
+            </div>
+        {% endfor %}
+    </div>
+
+{% endblock %}

@@ -1,0 +1,196 @@
+{% extends 'base.html' %}
+{% block head %}
+    <title>article</title>
+{% endblock %}
+
+{% block css %}
+    <style>
+
+        .buryit {
+            float: right;
+            margin-left: 20px;
+            width: 46px;
+            height: 52px;
+            background: url(/media/downdown.gif) no-repeat;
+            text-align: center;
+            cursor: pointer;
+            margin-top: 2px;
+            padding-top: 5px;
+        }
+
+        .diggit {
+            float: right;
+            width: 46px;
+            height: 52px;
+            background: url(/media/upup.gif) no-repeat;
+            text-align: center;
+            cursor: pointer;
+            margin-top: 2px;
+            padding-top: 5px;
+        }
+
+        .comment_textarea {
+            width: 362px;
+            height: 200px;
+            font-size: 13px;
+            padding: 8px;
+            margin-bottom: 10px;
+            color: #555;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            -moz-border-radius: 3px;
+            -webkit-border-radius: 3px;
+        }
+
+        .commentbox_title_left {
+            font-size: 14px;
+        }
+
+        #commentform_title {
+            font: normal normal 16px/35px "Microsoft YaHei";
+            margin: 10px 0 30px;
+            border-bottom: 2px solid #ccc;
+            background-image: none;
+            padding: 0;
+        }
+    .bq_post_comment {
+    margin: 0 0 5px 0;
+    font-style: normal;
+    line-height: 180%;
+    border: 1px solid #ddd;
+    padding: 10px;
+}
+#comment_list{
+            font: normal normal 16px/35px "Microsoft YaHei";
+            margin: 10px 0 30px;
+            border-bottom: 2px solid #ccc;
+            background-image: none;
+            padding: 0;}
+    </style>
+{% endblock %}
+
+{% block content_left %}
+    <div class="list-group">
+        <p class="list-group-item active">
+            文章标签
+        </p>
+        {#    r'^(?P<username>\w+)(?P<condition>classify|tag|time_classify)/(?P<param>.*)/',views.blog#}
+        {% for tag in tag_list %}
+            <a href="/{{ request.user }}/tag/{{ tag.2 }}" class="list-group-item">{{ tag.0 }}({{ tag.1 }})</a>
+        {% endfor %}
+    </div>
+    <div class="list-group">
+        <p class="list-group-item active">
+            文章分类
+        </p>
+        {% for classify in classify_list %}
+            <a href="/{{ request.user }}/classify/{{ classify.2 }}"
+               class="list-group-item">{{ classify.0 }}({{ classify.1 }})</a>
+        {% endfor %}
+    </div>
+    <div class="list-group">
+        <p class="list-group-item active">
+            时间分类
+        </p>
+        {% for month in month_list %}
+            <a href="#" class="list-group-item">{{ month.0 }}({{ month.1 }})</a>
+        {% endfor %}
+    </div>
+{% endblock %}
+
+{% block content_right %}
+    <h2>{{ article_obj.title }}</h2>
+    <div>{{ article_obj.content }}</div>
+    <div class="clearfix">
+        <div class="buryit action">
+            <span class="burynum" id="bury_count">{{ article_obj.down_num }}</span>
+        </div>
+
+        <div class="diggit action">
+            <span class="diggnum" id="digg_count">{{ article_obj.up_num }}</span>
+        </div>
+    </div>
+    <div class="clearfix">
+        <div class="pull-right">
+            <span class="info" style="color: red"></span>
+        </div>
+    </div>
+
+{#    评论楼的渲染#}
+    <div>
+    <div id="comment_list">评论列表</div>
+
+
+    </div>
+    {#    文章评论#}
+    <div>
+        <div id="commentform_title">发表评论</div>
+        <p>昵称：<input type="text" value="{{ request.user }} " disabled></p>
+        <div class="commentbox_title_left">评论内容：</div>
+        <p>
+            <textarea id="tbCommentBody" class="comment_textarea"></textarea>
+        </p>
+        <p><input type="submit" class="btn btn-primary" value="提交评论" id="id_submit"></p>
+    </div>
+
+    <script>
+
+
+        //点赞点踩
+        $('.action').click(function () {
+            let isUp = $(this).hasClass('diggit');
+            let $target = $(this);
+            $.ajax({
+                url: '/up_down/',
+                type: 'post',
+                data: {
+                    'is_up': isUp,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}',
+                    'article_id': '{{article_obj.pk}}'
+                },
+                success: function (data) {
+                    if (data.code == 1000) {
+                        $('.info').text(data.msg);
+                        let $span = $target.children();
+                        let oldNum = $span.text();
+                        $span.text(Number(oldNum) + 1);
+                    } else {
+                        $('.info').text(data.msg)
+                    }
+                }
+
+            });
+        });
+
+        //评论的提交
+        $('#id_submit').click(function () {
+            let $comment = $('#tbCommentBody').val();
+
+            $.ajax({
+                url: '/comment/',
+                type: 'post',
+                data: {
+                    'csrfmiddlewaretoken': '{{ csrf_token }}',
+                    'comment': $comment,
+                    'article_id':{{ article_obj.id }}
+                },
+                success: function (data) {
+                    if(data.code == 1000){
+                        let tmp = `
+       <div class="comment_my_posted">
+       <img style="vertical-align:middle" src="//static.cnblogs.com/images/icon_comment.gif">
+        <a href="/{{ username }}">
+        <b>{{ user_obj.username }}</b></a>:<blockquote class="bq_post_comment"> ${$comment} </blockquote></div>
+       `;
+
+                    }
+
+                }
+
+
+            })
+
+
+        })
+    </script>
+{% endblock %}

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>home</title>
+    {% load static %}
+    <script src="{% static 'jquery/jquery.min.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'bootstrap-3.3.7-dist/css/bootstrap.css' %}">
+    <script src="{% static 'bootstrap-3.3.7-dist/js/bootstrap.min.js' %}"></script>
+</head>
+<body>
+<nav class="navbar navbar-inverse">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                    data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">{{ request.user }}</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+                <li class="active"><a href="#">Link <span class="sr-only">(current)</span></a></li>
+                <li><a href="#">Link</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                       aria-expanded="false">更多操作<span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        {% if request.user.is_authenticated %}
+                            <li><a href="#">修改密码</a></li>
+                            <li><a href="#">退出登录</a></li>
+                        {% else %}
+                            <li><a href="#">登录</a></li>
+                            <li><a href="#">注册</a></li>
+                        {% endif %}
+
+                        <li><a href="#">Something else here</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="#">Separated link</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="#">One more separated link</a></li>
+                    </ul>
+                </li>
+            </ul>
+            <form class="navbar-form navbar-left">
+                <div class="form-group">
+                    <input type="text" class="form-control" placeholder="Search">
+                </div>
+                <button type="submit" class="btn btn-default">Submit</button>
+            </form>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="#">Link</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                       aria-expanded="false">更多操作 <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        {% if request.user %}
+                            <li><a href="#">修改密码</a></li>
+                            <li><a href="#">退出登录</a></li>
+                        {% else %}
+                            <li><a href="#">登录</a></li>
+                            <li><a href="#">注册</a></li>
+                        {% endif %}
+
+                        <li><a href="#">Something else here</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="#">Separated link</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div><!-- /.navbar-collapse -->
+    </div><!-- /.container-fluid -->
+</nav>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-2">
+            <div class="list-group">
+                <a href="#" class="list-group-item active">
+                    广告栏1
+                </a>
+                <a href="#" class="list-group-item">Dapibus ac facilisis in</a>
+                <a href="#" class="list-group-item">Morbi leo risus</a>
+                <a href="#" class="list-group-item">Porta ac consectetur ac</a>
+                <a href="#" class="list-group-item">Vestibulum at eros</a>
+            </div>
+             <div class="list-group">
+                <a href="#" class="list-group-item active">
+                    广告栏2
+                </a>
+                <a href="#" class="list-group-item">Dapibus ac facilisis in</a>
+                <a href="#" class="list-group-item">Morbi leo risus</a>
+                <a href="#" class="list-group-item">Porta ac consectetur ac</a>
+                <a href="#" class="list-group-item">Vestibulum at eros</a>
+            </div>
+
+        </div>
+
+        <div class="col-md-10  ">
+            {% for article in article_list %}
+            <div class="panel panel-success">
+                <p><a href="#"><h2>{{ article.title }}</h2></a></p>
+            <p>{{ article.abstract }}</p>
+{#                极客挖掘机 发布于 2019-12-15 09:32 评论(0)阅读(10)#}
+            <p><a href="#">{{ article.blog.userinfo.username }}</a> &nbsp;&nbsp;发布于 &nbsp;&nbsp;{{ article.create_time|date:'Y-m-d h:m:s' }}
+                <a href="#">&nbsp;&nbsp;评论({{ article.comment_num }})
+                </a> <a href="#">点赞({{ article.up_num }})</a></p>
+            </div>
+            {% endfor %}
+
+        </div>
+    </div>
+</div>
+</body>
+</html>
